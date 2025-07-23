@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Potato Disease Classifier</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #1e293b;
+    }
+
+    input[type="file"] {
+      padding: 10px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #1d4ed8;
+    }
+
+    h3 {
+      margin-top: 25px;
+      color: #334155;
+    }
+
+    #result {
+      font-weight: bold;
+      color: #0f172a;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Upload a Potato Leaf Image</h2>
+    <form id="upload-form">
+      <input type="file" id="file-input" name="file" accept="image/*" required /><br><br>
+      <button type="submit">Predict</button>
+    </form>
+
+    <h3>Prediction Result:</h3>
+    <p id="result">No result yet.</p>
+  </div>
+
+  <script>
+    const form = document.getElementById("upload-form");
+    const resultText = document.getElementById("result");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const fileInput = document.getElementById("file-input");
+      const file = fileInput.files[0];
+
+      if (!file) {
+        resultText.innerText = "Please select an image.";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const response = await fetch("/predict", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await response.json();
+        resultText.innerText = `Class: ${data.class}, Confidence: ${(data.confidence * 100).toFixed(2)}%`;
+      } catch (error) {
+        resultText.innerText = "Error: " + error.message;
+      }
+    });
+  </script>
+</body>
+</html>
